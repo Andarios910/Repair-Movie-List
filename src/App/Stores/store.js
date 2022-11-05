@@ -1,4 +1,6 @@
-import { configureStore } from "@reduxjs/toolkit";
+import {
+  configureStore
+} from "@reduxjs/toolkit";
 import loginSlice from "../Counter/loginSlice";
 import moviesSlice from "../Counter/movieSlice";
 import genresSlice from "../Counter/genresSlice";
@@ -10,7 +12,7 @@ import firebaseSlice from "../Counter/firebaseSlice";
 
 export const store = configureStore({
   reducer: {
-    login: loginSlice,
+    user: loginSlice,
     firebase: firebaseSlice,
     movies: moviesSlice,
     genre: genresSlice,

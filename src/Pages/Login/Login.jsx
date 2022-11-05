@@ -12,7 +12,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useDispatch } from 'react-redux';
 import { getLogin, getLoginGoogle } from '../../App/Counter/loginSlice';
 // import { auth, logInWithEmailAndPassword, signInWithGoogle } from "../../firebase";
-import { auth, logInWithEmailAndPassword, signInWithGoogle } from '../../App/Counter/firebaseSlice';
+import { auth, logInWithEmailAndPassword, signInWithGoogle } from '../../firebase';
 
 import { useAuthState } from "react-firebase-hooks/auth";
 import GoogleButton from 'react-google-button'
@@ -24,11 +24,7 @@ const Login = ({ open, onClose }) => {
   const [user, loading, error] = useAuthState(auth);
   const navigate = useNavigate();
   const [msg, setMsg] = useState('');
-  // const [email] = useState();
-  // const [password] = useState();
-  // // const [user, loading, error] = useAuthState(auth);
-  // const navigate = useNavigate();
-  // const [msg, setMsg] = useState('');
+
   const dataValue = {
     email: '',
     password: '',
@@ -39,26 +35,34 @@ const Login = ({ open, onClose }) => {
     const {name, value} = e.target;
     setData({ ...data, [name]: value});
   };
-  // const handleDataInput = (e) => {
-  //   setData({
-  //     ...data,
-  //     [e.target.name]: e.target.value,
-  //   });
-  // };
 
   const handleGoogle = () => {
-    dispatch(signInWithGoogle())
+    try {
+      dispatch(getLoginGoogle())
+    }catch(error) {
+      console.error(error)
+    }
   };
 
   // useEffect(() => {
   //   dispatch(getDetail(id))
   // }, [dispatch, id]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log(data)
-    dispatch(logInWithEmailAndPassword(data));
-  };
+    try {
+        dispatch(getLogin(data))
+        // console.log(data)
+    } catch(error) {
+        console.error(error);
+    }
+};
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   console.log(data)
+  //   // dispatch(logInWithEmailAndPassword(data));
+  // };
   // useEffect(() => {
   //   if (loading) return;
   //   if (user)
@@ -93,26 +97,26 @@ const Login = ({ open, onClose }) => {
         <CgCloseO onClick={() => onClose(false)} className="icon_close text-2xl cursor-pointer" />
       </div>
       <hr />
-      <form onSubmit={(e) => handleDataInput(e)}>
+      <form onSubmit={handleSubmit}>
         <div className="input_box">
           <input className='h-10 w-full' 
-          name='email'
-          value={data.email}
-          type="email"
-          onChange={handleSubmit}
-          placeholder="Email Address" 
-          pattern="^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+[.]+[a-zA-Z]{2,}$" required />
+            name='email'
+            value={data.email}
+            type="email"
+            onChange={handleDataInput}
+            placeholder="Email Address" 
+            pattern="^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+[.]+[a-zA-Z]{2,}$" required />
           <AiOutlineMail className="icon_form" />
         </div>
 
         <div className="input_box">
           <input className='h-10 w-full' 
-         name='password'
-         value={data.password}
-         type="password"
-         onChange={handleSubmit} 
-          placeholder="Password"  
-          required />
+              name='password'
+              value={data.password}
+              type="password"
+              onChange={handleDataInput} 
+              placeholder="Password"  
+              required />
           <FiEyeOff className="icon_form" />
         </div>
 
@@ -128,18 +132,6 @@ const Login = ({ open, onClose }) => {
             onClick={handleGoogle}
             // className="button"
           />
-
-          
-          
-
-          {/* <GoogleOAuthProvider clientId="1054221434578-4obkp9s6tn17m7hhlg65eqm61jpv3ooe.apps.googleusercontent.com">
-            <GoogleLogin
-              onSuccess={handleLoginGoogle}
-              onError={() => {
-                setMsg('Login Failed');
-              }}
-            />
-          </GoogleOAuthProvider> */}
 
         </div>
       </form>

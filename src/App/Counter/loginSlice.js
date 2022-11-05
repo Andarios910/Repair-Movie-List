@@ -3,13 +3,9 @@
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  logInWithEmailAndPassword,
-  registerWithEmailAndPassword,
-  signInWithGoogle,
-} from "../../firebase";
+import { logInWithEmailAndPassword, registerWithEmailAndPassword, signInWithGoogle,} from "../../firebase";
 
-export const handleLogin = createAsyncThunk(
+export const getLogin = createAsyncThunk(
   "login/getLogin",
   async (formValues) => {
     try {
@@ -17,9 +13,8 @@ export const handleLogin = createAsyncThunk(
         formValues.email,
         formValues.password
       );
-      console.log(req);
-      // localStorage.setItem("token", JSON.stringify(req.user.accessToken));
-      // localStorage.setItem("user", JSON.stringify(req.user));
+      localStorage.setItem('credential', JSON.stringify(req.user.accessToken))
+      localStorage.setItem('name', JSON.stringify(req.user.displayName))
       setTimeout(() => {
         window.location.reload(1);
       }, 1500);
@@ -37,25 +32,31 @@ export const handleLogin = createAsyncThunk(
 
 export const getLoginGoogle = createAsyncThunk(
   "loginGoogle/getLoginGoogle",
-  async (credentialResponse) => {
-    var decoded = jwt_decode(credentialResponse.credential);
-    console.log(decoded);
-    localStorage.setItem("credential", credentialResponse.credential);
-    localStorage.setItem("given_name", decoded.given_name);
-    localStorage.getItem("picture", decoded.picture);
-    return decoded;
+  async () => {
+    try {
+      const req = await signInWithGoogle();
+      console.log(req)
+      localStorage.setItem('credential', JSON.stringify(req.accessToken))
+      localStorage.setItem('name', JSON.stringify(req.displayName));
+      setTimeout(() => {
+        window.location.reload(1)
+      }, 1500)
+    } catch(error) {
+      console.error(error)
+    }
   }
 );
 
 export const getUserRegist = createAsyncThunk(
   "userRegist/getUserRegist",
-  async () => {
+  async (formValues) => {
     try {
-      const res = await axios.post(
-        `https://notflixtv.herokuapp.com/api/v1/users/login`
-      );
-      console.log(res);
-      // return res;
+      const res = await registerWithEmailAndPassword(formValues.name, formValues.email, formValues.password)
+      localStorage.setItem('credential', JSON.stringify(res.accessToken));
+      localStorage.setItem('name', JSON.stringify(res.displayName))
+      setTimeout(() => {
+        window.location.reload(1)
+      }, 1500)
     } catch (error) {
       console.log("error");
     }
@@ -92,7 +93,4 @@ export const loginSlice = createSlice({
 
 export const { login, logout } = loginSlice.actions;
 
-// export const selectUser = (state) => state.user.user;
-
 export default loginSlice.reducer;
-// export default userSlice.reducer;

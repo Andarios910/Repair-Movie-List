@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import {
   auth,
   registerWithEmailAndPassword,
-} from '../../App/Counter/firebaseSlice';
+} from '../../firebase';
 import "./Register.css";
 
 const Register = ({ openRes, onCloseRes }) => {
@@ -28,6 +28,7 @@ const Register = ({ openRes, onCloseRes }) => {
   const dispatch = useDispatch();
   // const [msg, setMsg] = useState('');
   const dataValue = {
+    name: '',
     email: '',
     password: '',
   }
@@ -47,9 +48,8 @@ const Register = ({ openRes, onCloseRes }) => {
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
-    e.preventDefault(data);
-    // console.log(data)
-    dispatch(registerWithEmailAndPassword(data));
+    e.preventDefault();
+    dispatch(getUserRegist(data));
   };
   // useEffect(() => {
   //   if (loading) return;
@@ -114,11 +114,11 @@ const Register = ({ openRes, onCloseRes }) => {
   //     .catch((err) => console.log(err));
   // };
   
-  if (msg) {
-    setTimeout(() => {
-      setMsg('');
-    }, 10000);
-  }
+  // if (msg) {
+  //   setTimeout(() => {
+  //     setMsg('');
+  //   }, 10000);
+  // }
   return (
     <div className={`wrap_form_Res`}>
       <span className={`error ${msg && 'muncul'}`}>{msg} !!</span>
@@ -128,35 +128,38 @@ const Register = ({ openRes, onCloseRes }) => {
       </div>
       <hr />
       <div className="wrapper_form">
-        <form onSubmit={(e) => handleDataInput(e)}>
+        <form onSubmit={handleRegister}>
 
-          {/* <div className="input_box">
+          <div className="input_box">
             <input type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full Name" 
+                name='name'
+                value={data.name}
+                onChange={handleDataInput}
+                placeholder="name" 
                 required />
                 <FaRegUser className="icon_form" />
-          </div> */}
+          </div>
 
           <div className="input_box">
             <input type="text"
                 className="register__textBox h-10 w-full"
                 name='email'
                 value={data.email}
-                onChange={handleRegister}
+                onChange={handleDataInput}
                 placeholder="E-mail Address" 
                 required />
                 <AiOutlineMail className="icon_form" />
           </div>
 
           <div className="input_box">
-            <input  type="password"
+            <input  
+                type="password"
                 className="register__textBox h-10 w-full"
                 name='password'
                 value={data.password}
-                onChange={handleRegister}
+                onChange={handleDataInput}
                 placeholder="Password" 
+                current-password=''
                 required />
                 <FiEyeOff className="icon_form" />
           </div>
